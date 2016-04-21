@@ -122,6 +122,8 @@ unsigned int levDis(string &a, string &b) { //Finds the minimum distance between
 	return mat[sA][sB]; 
 }
 
+
+
 int main() {
 
 	int size, magi;
