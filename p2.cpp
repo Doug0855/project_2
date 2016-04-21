@@ -9,8 +9,8 @@ using namespace std;
 class Realm {  //Data structure to hold realm info, contains methods to calculate certain properties of the realm
 private:
 	string charm;
-	int magi[10000];
-	int power;
+	int magi[10000]; //Holds the powers and order of the magi
+	int power; //Calculated value that ignores magi of lesser power to determine the max number of incantations possible for the given relam
 public:
 	Realm(string charm, int magi) {
 		setMagi(magi);
@@ -26,6 +26,7 @@ public:
 		return power;
 	}
 
+	//Calculates the max number of incantations possible for a given realm, 
 	void setPower(int size) {
 		int nPow = 1;
 		int maxMagi = magi[0]; 
@@ -59,6 +60,8 @@ public:
 		charm = ch; 
 	}
 
+
+	//Returns the gem cost of moving to the next realm, given the levenshtein distance between the 2 strings
 	int getGems(int dist) {
 		int gems = magi[0]; 
 		int maxMagi = magi[0];
@@ -80,20 +83,20 @@ public:
 
 };
 
-unsigned int levDis(string &a, string &b) { //Finds the minimum distance between 2 strings, including inserts, deletes, swaps
+unsigned int levDis(string &a, string &b) { //Finds the minimum distance between 2 strings, including inserts, deletes, swaps, Implements the Levenshtein Distance algorithm
 	unsigned int sA = a.size();
-	unsigned int sB = b.size(); 
+	unsigned int sB = b.size();   //Uses unsigned ints to prevent negative edge weights
 	unsigned int min1, min2, offset; 
 
 	vector<vector<unsigned int> > mat(sA + 1, vector<unsigned int>(sB+1));
 
 	mat[0][0] = 0;
-	for (unsigned int i = 1; i <= sA; ++i) //Fills the first row with 1-n for inserts/deletes 
+	for (unsigned int i = 1; i <= sA; ++i) //Fills the first row with 1->n for inserts/deletes 
 	{
 		mat[i][0] = i;
 	}
 
-	for (unsigned int i = 1; i <= sB; ++i) //fills the first column with 1-n for inserts/deletes
+	for (unsigned int i = 1; i <= sB; ++i) //fills the first column with 1->n for inserts/deletes
 	{
 		mat[0][i] = i;
 	}
@@ -119,75 +122,6 @@ unsigned int levDis(string &a, string &b) { //Finds the minimum distance between
 	return mat[sA][sB]; 
 }
 
-Realm* realmSort(realm verse[], int size, start) { //Puts starting realm in verse[0],
-	int minDist;									//Puts sorts by closest realms
-	for (int i = 1; i < size; ++i)
-	{
-		for (int j=i ; j < count; ++j)
-		{
-			
-		}
-	}
-
-	return verse; 
-}
-
-void journey(Realm verse[], int size, string endCharm) { //Takes in sorted array of Realms
-							 		    //Calculates minimum Incantations
-	stack<Realm> s;			            //and gems needed going there and back
-	s.push(verse[0]);
-	Realm curRealm, newRealm;
-
-	int gems = 0;
-	int incantations = 0;
-
-	int dist;
-
-	//Going to target destination
-	for (int i = 1; i < size; ++i)
-	{
-		dist = levDis(verse[i-1].getCharm(), verse[i].getCharm());		
-		if (dist > verse[i-1].getPower()) 	
-		{
-			cout << "IMPOSSIBLE" << endl; 
-			break;
-		} else {
-			incantations += dist; 
-			gems += verse[i-1]].getGems(dist); 
-			s.push(verse[i]);
-			verse[i-1].spendPower(dist); 
-			if (verse[i].getCharm() == endCharm)
-			{
-				cout << incantations << " " << gems << endl; 
-				break;
-			}
-		}
-	}
-
-	//Now going back
-	incantations = 0;
-	gems = 0; 
-	while (!s.empty()) {
-		curRealm = s.top();
-		s.pop();
-		newRealm = s.top(); 
-		dist = levDis(curRealm.getCharm(), newRealm.getCharm());
-		if (dist > curRealm.getPower())
-		{
-			cout << "IMPOSSIBLE" << endl;
-			break; 
-		} else {
-			incantations += dist; 
-			gems += getGems(dist); 
-			if (newRealm.getCharm() == verse[0].getCharm())
-			{
-				cout << incantations << " " << gems << endl; 
-				break;
-		}
-	}
-
-
-}
 int main() {
 
 	int size, magi;
@@ -205,13 +139,10 @@ int main() {
 
 
 	}
-	cin >> start >> end; 
-	verse = realmSort(verse, size, start); 
 
-	for (int i = 0; i < size; ++i)
-	{
-		cout << verse[i].getCharm() << " : " << verse[i].getPower() << endl; 
-	}
+	cin >> start >> end; 
+
+
 
 	return 0; 
 }
