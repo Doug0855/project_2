@@ -1,0 +1,9 @@
+Things we need to do put "***" in front of number if you finish it
+
+1) 	Rewrite setpower() to maximize magi
+
+2) 	Create adjacency matrix to make graph
+		a)	Edge lengths are number incantations
+
+3) 	Implement Dijkstra's algo  to find least number incantions
+	between realms
