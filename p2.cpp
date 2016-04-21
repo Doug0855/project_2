@@ -9,7 +9,7 @@ using namespace std;
 class Realm {  //Data structure to hold realm info, contains methods to calculate certain properties of the realm
 private:
 	string charm;
-	int magi[10000]; //Holds the powers and order of the magi
+	int* magi; //Holds the powers and order of the magi
 	int power; //Calculated value that ignores magi of lesser power to determine the max number of incantations possible for the given relam
 public:
 	Realm(string charm, int magi) {
@@ -74,6 +74,7 @@ public:
 			}
 			magi[i] = 0;
 		}
+		return gems;
 	}
 
 	void spendPower(int amount) {
