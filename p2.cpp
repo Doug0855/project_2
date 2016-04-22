@@ -84,7 +84,7 @@ public:
 
 };
 
-unsigned int levDis(string &a, string &b) { //Finds the minimum distance between 2 strings, including inserts, deletes, swaps, Implements the Levenshtein Distance algorithm
+unsigned int levDis(string a, string b) { //Finds the minimum distance between 2 strings, including inserts, deletes, swaps, Implements the Levenshtein Distance algorithm
 	unsigned int sA = a.size();
 	unsigned int sB = b.size();   //Uses unsigned ints to prevent negative edge weights
 	unsigned int min1, min2, offset; 
@@ -140,12 +140,30 @@ int main() {
 
 		verse[i] =  Realm(charm, magi);  	
 
-
 	}
 
 	cin >> start >> end; 
 
+	//Construct Adjacency Matrix for Graph
+	int adjMatrix[size][size];
+	for (int i = 0; i < size; ++i)
+	{
+		for (int j = 0; j < size; ++j)
+		{
+			adjMatrix[i][j] = levDis(verse[i].getCharm(),verse[j].getCharm());
+		}
+	}
 
+	//Prints Adjancency Matrix for debugging
+	for (int i = 0; i < size; ++i)
+	{
+		for (int j = 0; j < size; ++j)
+		{
+			cout << adjMatrix[i][j] << " ";
+		}
+
+		cout << endl;
+	}
 
 	return 0; 
 }
