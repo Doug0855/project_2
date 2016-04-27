@@ -167,63 +167,49 @@ unsigned int levDis(string a, string b) { //Finds the minimum distance between 2
     return mat[sA][sB];
 }
 
-void dijkstra(vector< vector<int> > &adjMatrix,int source,int size, vector<int> &predecessor, vector<int> &distance)
+unsigned int dijkstra(class Realm verse[], vector< vector<unsigned int> > &adjMatrix, int sourcenode, int endnode, int size, vector<int> &predecessor)
 {
     
-    vector<bool> sptSet;    //shortest path tree set
-
-    //**for loop causes core dump**
+    vector<Realm> vertexSet (size);
+    
     for(int i = 0; i < size; i++)
     {
         /*
-        distance[i] = INT_MAX;
-        predecessor[i] = -1;
-        sptSet[i] = false;
+        predecessor[i] = 100;   //in place of undefined?
+        distance[i] = 100;  //in place of infitiy?
+        vertexSet[i] = verse[i];
         */
-        distance.push_back(INT_MAX);
-        predecessor.push_back(-1);
-        sptSet.push_back(false);
+        distance.push_back(100);
+        predecessor.push_back(100);
+        //vertexSet.push_back(i);
     }
-    distance[source] = 0;
-
-    for(int i = 0; i < size-1; i++)
+    
+    distance[sourcenode] = 0;
+    sort(distance.begin(), distance.end());
+    int counter = 0;
+    while(counter < size)   //!vertexSet.empty()
     {
-        //pick minimum distance vertex
-        int min = INT_MAX;
-        int min_index;
-        for(int j = 0; j < size; j++)
+        //Realm current = vertexSet[counter];
+        for(int i = 0; i < size; i++)
         {
-            if(distance[j] <= min && sptSet[j] == false)
+            if(adjMatrix[counter][i] <= verse[i].getPower())    //enough magi to make incantations
             {
-                min = distance[j];
-                min_index = j;
+                unsigned int size = distance[counter] + adjMatrix[counter][i];
+                if(size < distance[i])
+                {
+                    distance[i] = size;
+                    predecessor[i] = counter;
+                }
             }
         }
-        //terminate if min_index = end
-        sptSet[min_index] = true;
-
-        for(int j = 0; j < size; j++)
-        {
-            if(distance[min_index] != INT_MAX && !sptSet[j] && distance[min_index] + adjMatrix[min_index][j] < distance[j])
-            {
-                distance[j] = distance[min_index] + adjMatrix[min_index][j];
-                predecessor[j] = min_index;
-            }
-        }
+        counter++;
     }
-
+    
+    return distance[endnode];
     
 }
 
 int main() {
-    /*
-    int shit;
-    cout << "input a size\n";
-    cin >> shit;
-    cout << "input magis\n";
-    Realm test("A", shit);
-    std::cout << "Power is: " << test.power << "\n";
-    */
     int size, magi;
      string charm, start, end;
      cin >> size;
@@ -251,32 +237,21 @@ int main() {
      }
      }
      //find source realm number
-     int source;
+     int source, target;
      for(int i = 0; i < size; i++)
      {
         if(verse[i].getCharm() == start)
         {
             source = i;
         }
+        if(verse[i].getCharm() == end)
+        {
+            targert = i;
+        }
      }
      vector<int> predecessor(size);
      vector<int> distance(size);
-     dijkstra(adjMatrix,source,size,predecessor,distance);
-     for(int i = 0; i < size; i++)
-     {
-        cout << " " << distance[i];
-     }
-     /*
-     //Prints Adjancency Matrix for debugging
-     for (int i = 0; i < size; ++i)
-     {
-     for (int j = 0; j < size; ++j)
-     {
-     cout << adjMatrix[i][j] << " ";
-     }
-     
-     cout << endl;
-     }
-     */
+     dijkstra(verse,adjMatrix,source,end,size,predecessor,distance);
+
      return 0;
 }
