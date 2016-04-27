@@ -9,18 +9,23 @@ using namespace std;
 class Realm {  //Data structure to hold realm info, contains methods to calculate certain properties of the realm
 public:
     string charm;
-    int size;	//Size of magi Array
-    int* magi; 	//Holds the values and sequence of the magi
-    int power; 	//Max number of incantations possible for the given relam
-    
+    int size;    //Size of magi Array
+    int* magi;   //Holds the values and sequence of the magi
+    int* order;   //LSI of magi to use. Can use as many as needed
+    int power;   //Max number of incantations possible for the given relam
+    int gems;    //Number of gems required to leave realm
+
     Realm(string charm, int nummagi) {
         
-        size = nummagi;	//Easy for referencing later
+        size = nummagi; //Easy for referencing later
         magi = new int[size];
-        power = 1;		//Need to set this to increment later
+        power = 1;      //Need to set this to increment later
+        gems = 0;       //Need to set this to increment later
         
         setMagi();
-        setPower();
+        cout << "set the magi\n";
+        setPowerandGems();
+        cout << "set da powah\n";
         setCharm(charm);
     }
     
@@ -29,10 +34,19 @@ public:
     }
     
     //Calculates the max number of incantations possible for a given realm,
-    void setPower() {
+    void setPowerandGems() {
         
         //Setting array for LIS
         
+        //Used for tracing path through numbers
+        //Each value stores magi index of previous value in lis
+        //i.e. magi =  {0, 9, 2, 4} will have parent {-1, 0, 0, 2}
+        /*
+        Longest path will be magi[parent[3]] preceeded by 
+        magi[parent[2]], preceeded by magi[parent[0]];
+        */
+        int parent[size];
+
         //Used to store indexes of magi to do lis
         //Numbers stored are INDEXES of magi array
         //i.e. lis[3] = 4. Used to reference magi[4]
@@ -43,21 +57,26 @@ public:
         int middle;
         
         //Initializing both
-        for(int i = 0; i < size+1; i++) {
+        for(int i = 0; i < size; i++) {
+            parent[i] = -1;
             lis[i] = -1;
         }
+        lis[size] = 0;
         
         // Beginning LSI
-        lis[0] = 0;			//Always evaluating magi[0] first
-        int lp = 1;			//LIS array increments differently
+        lis[0] = 0;         //Always evaluating magi[0] first
+        int lp = 1;         //LIS array increments differently
         
         for (int i = 1; i < size; ++i)
         {
             high = lp;
             
+            cout << magi[i] << " is next up\n";
             //If next magi is larger, we put it in next
             if(magi[i] > magi[lis[lp-1]]) {
+                cout <<"lis at " <<lp<< " is " << i << "\n";
                 lis[lp] = i;
+                parent[i] = lis[lp-1];
                 power += 1;
                 lp++;
             }
@@ -82,9 +101,36 @@ public:
                     }
                     
                     lis[low] = i;
+                    parent[i] = lis[low-1];
                 }
             }
         }
+        cout << "parent array is: ";
+        for(int i = 0; i < size; i++) {
+            cout << "[" << parent[i] << "]";
+        }
+        cout << "\n";
+
+
+        cout << "lis array is: ";
+        for(int i = 0; i < size; i++) {
+            cout << "[" << lis[i] << "]";
+        }
+        cout << "\n";
+
+        order = new int[power];
+        int parentpos = lis[lp-1];
+
+        for(int i = power -1; i > -1; i--) {
+            order[i] = magi[parentpos];
+            parentpos = parent[parentpos];
+        }
+
+        cout << "order array is: ";
+        for(int i = 0; i < power; i++) {
+            cout << "[" << order[i] << "]";
+        }
+        cout << "\n";
     }
     
     void setMagi() {
@@ -219,35 +265,35 @@ int dijkstra(class Realm verse[], vector< vector<int> > &adjMatrix, int sourceno
 
 int main() {
     int size, magi;
-     string charm, start, end;
-     cin >> size;
-     Realm verse[size];
+    string charm, start, end;
+    cin >> size;
+    Realm verse[size];
      
-     for (int i = 0; i < size; ++i)
-     {
+    for (int i = 0; i < size; ++i)
+    {
      
-     cin >> charm;
-     cin >> magi;
+    cin >> charm;
+    cin >> magi;
      
-     verse[i] =  Realm(charm, magi);
+    verse[i] =  Realm(charm, magi);
      
-     }
+    }
      
-     cin >> start >> end;
+    cin >> start >> end;
      
-     //Construct Adjacency Matrix for Graph
-     vector<vector<int> > adjMatrix(size, vector<int>(size));
-     for (int i = 0; i < size; ++i)
-     {
-     for (int j = 0; j < size; ++j)
-     {
-     adjMatrix[i][j] = levDis(verse[i].getCharm(),verse[j].getCharm());
-     }
-     }
-     //find source realm number
-     int source, target;
-     for(int i = 0; i < size; i++)
-     {
+    //Construct Adjacency Matrix for Graph
+    vector<vector<int> > adjMatrix(size, vector<int>(size));
+    for (int i = 0; i < size; ++i)
+    {
+    for (int j = 0; j < size; ++j)
+    {
+    adjMatrix[i][j] = levDis(verse[i].getCharm(),verse[j].getCharm());
+    }
+    }
+    //find source realm number
+    int source, target;
+    for(int i = 0; i < size; i++)
+    {
         if(verse[i].getCharm() == start)
         {
             source = i;
@@ -256,10 +302,10 @@ int main() {
         {
             target = i;
         }
-     }
-     vector<int> predecessor(size);
-     vector<int> distance(size);
-     cout << dijkstra(verse,adjMatrix,source,target,size,predecessor,distance) << endl;
+    }
+    vector<int> predecessor(size);
+    vector<int> distance(size);
+    cout << dijkstra(verse,adjMatrix,source,target,size,predecessor,distance) << endl;
 
-     return 0;
+    return 0;
 }
