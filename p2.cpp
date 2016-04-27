@@ -7,14 +7,22 @@
 using namespace std;
 
 class Realm {  //Data structure to hold realm info, contains methods to calculate certain properties of the realm
-private:
-	string charm;
-	int* magi; //Holds the powers and order of the magi
-	int power; //Calculated value that ignores magi of lesser power to determine the max number of incantations possible for the given relam
 public:
-	Realm(string charm, int magi) {
-		setMagi(magi);
-		setPower(magi); 
+	string charm;
+	int size;	//Size of magi Array
+	int* magi; 	//Holds the values and sequence of the magi
+	int power; 	//Max number of incantations possible for the given relam
+
+	Realm(string charm, int nummagi) {
+
+		size = nummagi;	//Easy for referencing later
+		magi = new int[size];
+		power = 1;		//Need to set this to increment later
+
+		setMagi();
+		cout << "set the magi\n";
+		setPower(); 
+		cout << "set da powah\n";
 		setCharm(charm); 
 	}
 
@@ -22,34 +30,65 @@ public:
 		//Default constructer//
 	}
 
-	int getPower() {
-		return power;
-	}
-
 	//Calculates the max number of incantations possible for a given realm, 
-	void setPower(int size) {
-		int nPow = 1;
-		int maxMagi = magi[0]; 
-		for (int i = 1; i < size; ++i)
+	void setPower() {
+
+		//Setting array for LIS
+
+		//Used to store indexes of magi to do lis
+		//Numbers stored are INDEXES of magi array
+		//i.e. lis[3] = 4. Used to reference magi[4]
+		int lis[size+1];
+
+		//Initializing both
+		for(int i = 0; i < size+1; i++) {
+			lis[i] = -1;
+		}
+
+		// Beginning LSI
+		lis[0] = 0;			//Always evaluating magi[0] first
+		int lp = 1;			//LIS array increments differently
+
+		for (int i = 1; i < size; ++i) 
 		{
-			if (magi[i] > maxMagi)		
-			{
-				nPow++;
-				maxMagi = magi[i]; 
+			cout << magi[i] << " is next up\n";
+			//If next magi is larger, we put it in next
+			if(magi[i] > magi[lis[lp-1]]) {
+				cout <<"lis at " <<lp<< " is " << i << "\n";
+				lis[lp] = i;
+				power += 1;
+				lp++;
+			}
+
+			//If next magi smaller, we scan to see where it goes
+			else if(magi[i] < magi[lis[lp-1]]) {
+/****************************************************************/
+//SO FAR THIS INCREMENTS. MIGHT NEED A BINARY SEARCH FOR OPTIMIZATION
+				//Temp lis position so we don't mess with lp
+				int temppos = 0;
+
+				//Finding the ceiling value to replace
+				while(magi[i] > magi[lis[temppos]]) {
+					temppos++;
+				}
+				lis[temppos] = i;
+				cout <<"lis at " <<lp<< " is " << i << "\n";
+/****************************************************************/
 			}
 		}
-
-		power = nPow; 
+		cout << "lis array is: ";
+		for(int i = 0; i < size; i++) {
+			cout << "[" << lis[i] << "]";
+		}
+		cout << "\n";
 	}
 
-	void setMagi(int size) {
-		int nMagi[size]; 
+	void setMagi() {
 		for (int i = 0; i < size; ++i)
 		{
-			cin >> nMagi[i];
+			cin >> magi[i];
 
 		}
-		magi = nMagi; 
 	}
 
 	string getCharm() {
@@ -76,11 +115,12 @@ public:
 		}
 		return gems;
 	}
-
+/********************************************************************/
+	//Is this needed? Can't save power between realms
 	void spendPower(int amount) {
 		power -= amount; 
 	}
-
+/********************************************************************/
 
 };
 
@@ -126,8 +166,13 @@ unsigned int levDis(string a, string b) { //Finds the minimum distance between 2
 
 
 int main() {
-
-	int size, magi;
+	int shit;
+	cout << "input a size\n";
+	cin >> shit;
+	cout << "input magis\n";
+	Realm test("A", shit);
+	std::cout << "Power is: " << test.power << "\n";
+	/*int size, magi;
 	string charm, start, end;
 	cin >> size;
 	Realm verse[size]; 
@@ -165,5 +210,5 @@ int main() {
 		cout << endl;
 	}
 
-	return 0; 
+	return 0;*/
 }
