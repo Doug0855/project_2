@@ -86,7 +86,7 @@ public:
             //If next magi smaller, we scan to see where it goes
             else if(magi[i] < magi[lis[lp-1]]) {
                 
-                if (magi[i] < magi[lis[0]])
+                if (magi[i] <= magi[lis[0]])
                     lis[0] = i;
                 
                 //BINARY SEARCH
@@ -101,6 +101,9 @@ public:
                         else low = middle + 1;
                         
                     }
+                    
+                    if (low == magi[i])
+                        continue;
                     
                     lis[low] = i;
                     parent[i] = lis[low-1];
