@@ -278,6 +278,35 @@ int dijkstra(class Realm verse[], vector< vector<int> > &adjMatrix, int sourceno
     
 }
 
+
+void backtrack(vector<int> &previous, vector<Realm> &verse, int start, int end) {
+    int gems = 0; 
+    int encants = 0;
+    int distance = 0;
+    int current = previous[end];
+
+    while(1) {
+        distance = levDis(verse[current].charm, verse[previous[current]].charm);
+        if (verse[previous[current]].power < distance)
+        {
+            cout << "IMPOSSIBLE" << endl;
+            break;
+        } 
+
+        gems += verse[previous[current]].getGems(distance); 
+        encants += dist; 
+
+        if (previous[current] == start)
+        {
+            cout << encants << " " << gems << endl; 
+            break; 
+        } else {
+            current = previous[current]; 
+        }
+    }
+} 
+
+
 int main() {
     
     int size, magi;
