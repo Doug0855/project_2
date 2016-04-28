@@ -10,24 +10,28 @@ using namespace std;
 class Realm {  //Data structure to hold realm info, contains methods to calculate certain properties of the realm
 public:
     string charm;
-    int size;    //Size of magi Array
-    int* magi;   //Holds the values and sequence of the magi
-    int* order;   //LSI of magi to use. Can use as many as needed
-    int power;   //Max number of incantations possible for the given relam
-    int gems;    //Number of gems required to leave realm
-    int dvalue;   //value from the distance array for this node in Dijkstra
+    int size;       //Size of magi Array
+    int* magi;      //Holds the values and sequence of the magi
+    int* order;     //LSI of magi to use. Can use as many as needed
+    int power;      //Max number of incantations possible for the given relam
+    int gems;       //Number of gems required to leave realm
+    int dvalue;     //Value from the distance array for this node in Dijkstra
+    int realm_num;  //Index for realm
+    bool popped;    //Has the Node been popped in Dijkstra's?
 
-    Realm(string charm, int nummagi) {
+    Realm(string charm, int nummagi, int num) {
         
+        realm_num = num;
         size = nummagi; //Easy for referencing later
         magi = new int[size];
         power = 1;      //Need to set this to increment later
         gems = 0;       //Need to set this to increment later
+        popped = false;
         
         setMagi();
-        cout << "set the magi\n";
+        //cout << "set the magi\n";
         setPowerandGems();
-        cout << "set da powah\n";
+        //cout << "set da powah\n";
         setCharm(charm);
     }
     
@@ -73,10 +77,10 @@ public:
         {
             high = lp;
             
-            cout << magi[i] << " is next up\n";
+            //cout << magi[i] << " is next up\n";
             //If next magi is larger, we put it in next
             if(magi[i] > magi[lis[lp-1]]) {
-                cout <<"lis at " <<lp<< " is " << i << "\n";
+                //cout <<"lis at " <<lp<< " is " << i << "\n";
                 lis[lp] = i;
                 parent[i] = lis[lp-1];
                 power += 1;
@@ -101,28 +105,27 @@ public:
                         else low = middle + 1;
                         
                     }
-                    
-                    if (low == magi[i]) {
+                    if(low == magi[i]) {
                         continue;
                     }
-                    
                     lis[low] = i;
                     parent[i] = lis[low-1];
                 }
             }
         }
-        cout << "parent array is: ";
-        for(int i = 0; i < size; i++) {
-            cout << "[" << parent[i] << "]";
-        }
-        cout << "\n";
+        
+        // cout << "parent array is: ";
+        // for(int i = 0; i < size; i++) {
+        //  cout << "[" << parent[i] << "]";
+        // }
+        // cout << "\n";
+        
 
-
-        cout << "lis array is: ";
-        for(int i = 0; i < size; i++) {
-            cout << "[" << lis[i] << "]";
-        }
-        cout << "\n";
+        // cout << "lis array is: ";
+        // for(int i = 0; i < size; i++) {
+        //  cout << "[" << lis[i] << "]";
+        // }
+        // cout << "\n";
 
         order = new int[power];
         int parentpos = lis[lp-1];
@@ -132,11 +135,11 @@ public:
             parentpos = parent[parentpos];
         }
 
-        cout << "order array is: ";
-        for(int i = 0; i < power; i++) {
-            cout << "[" << order[i] << "]";
-        }
-        cout << "\n";
+        // cout << "order array is: ";
+        // for(int i = 0; i < power; i++) {
+        //  cout << "[" << order[i] << "]";
+        // }
+        // cout << "\n";
     }
     
     void setMagi() {
@@ -158,15 +161,23 @@ public:
     
     //Returns the gem cost of moving to the next realm, given the levenshtein distance between the 2 strings
     int getGems(int dist) {
+        cout << "Flag 5" << endl;
         if(dist > power) {
             return 0;
         }
         else {
+            cout << "Flag 7" << endl;
             for(int i = 0; i < dist; i++) {
+                cout << order[i] << endl; 
                 gems += order[i];
             }
+            cout << "Flag 8" << endl;
+            return gems; 
         }
+
+        cout << "Flag 9"  << endl; 
     }
+    
 };
 
 unsigned int levDis(string a, string b) { //Finds the minimum distance between 2 strings, including inserts, deletes, swaps, Implements the Levenshtein Distance algorithm
@@ -209,81 +220,101 @@ unsigned int levDis(string a, string b) { //Finds the minimum distance between 2
 }
 struct realm_dvalue_greater_than {
     bool operator()(const Realm& a, const Realm& b) const {
-        return a.dvalue < b.dvalue;
+        return a.dvalue > b.dvalue;
     }
 };
 
-int dijkstra(class Realm verse[], vector< vector<int> > &adjMatrix, int sourcenode, int endnode, int size, vector<int> &predecessor,vector<Realm> &distance, string startrealm,string endrealm)
+int dijkstra(vector<Realm> &verse, vector< vector<int> > &adjMatrix, int sourcenode, int endnode, int size, vector<int> &predecessor,vector<Realm> &distance, string startrealm,string endrealm)
 {
-    
+    priority_queue<Realm,vector<Realm>,realm_dvalue_greater_than> minHeap;
     vector<Realm> vertexSet (size);
     int start_index;
     int end_index;
     
     for(int i = 0; i < size; i++)
     {
-        distance.push_back(verse[i]);
-        if(distance[i].charm == startrealm)
+        verse[i].dvalue = INT_MAX;
+        predecessor.push_back(INT_MAX);
+        //vertexSet.push_back(i);
+        if(verse[i].charm == startrealm)
         {
             //start_index = i;
-            distance[i].dvalue = 0;
-            cout << distance[i].dvalue << endl;
+            verse[i].dvalue = 0;
         }
-        else if(distance[i].charm == endrealm)
+        else if(verse[i].charm == endrealm)
         {
             end_index = i;
         }
-        else
-        {        
-            distance[i].dvalue = INT_MAX;
-            predecessor.push_back(INT_MAX);
-            //vertexSet.push_back(i);
-        }  
+        minHeap.push(verse[i]);
     }
-    
-    make_heap(distance.begin(),distance.end(),realm_dvalue_greater_than());
-    //cout << distance.front().dvalue << endl;
-    /*
-    int counter = 0;
-    while(counter < size)   //!vertexSet.empty()
+        
+    //make_heap(verse.begin(),verse.end(),realm_dvalue_greater_than());
+    while(!minHeap.empty())   //!vertexSet.empty()
     {
-        //Realm current = vertexSet[counter];
+        Realm current = minHeap.top();
+        minHeap.pop();
+        current.popped = true;
+        current.realm_num;
+        //cout  << current.charm << " -> ";
+
+        //sets popped realm's popped bool to true
+        for(int i= 0; i < size; i++)
+        {
+            if(current.realm_num == i)
+            {
+                verse[i].popped = true;
+            }
+        }
+        //for each adjacent realm
         for(int i = 0; i < size; i++)
         {
-            if(adjMatrix[counter][i] <= verse[i].power)    //enough magi to make incantations
+            int index = current.realm_num;
+            if(adjMatrix[index][i] <= verse[index].power)    //enough magi to make incantations
             {
-                int length = distance[counter] + adjMatrix[counter][i];
-                if(length < distance[i])
+                int length = current.dvalue + adjMatrix[index][i];
+                if(length < verse[i].dvalue)
                 {
-                    distance[i] = size;
-                    predecessor[i] = counter;
+                    //cout << verse[i].charm << endl;
+                    //cout << "New length: " << length << "    " << "Old length: " << verse[i].dvalue << endl;
+                    verse[i].dvalue = length;
+                    predecessor[i] = index;
                 }
             }
         }
-        counter++;
+
+        priority_queue<Realm,vector<Realm>,realm_dvalue_greater_than> tempHeap;
+        for(int i = 0; i < size; i++)
+        {
+            if(verse[i].popped == false)
+            {
+                tempHeap.push(verse[i]);
+            }
+            minHeap = tempHeap;
+        }
     }
-    */
-    return 1;
-    //return distance[end_index].dvalue;
+    
+    return verse[end_index].dvalue;
     
 }
 
-
-void backtrack(vector<int> &previous, vector<Realm> &verse, vector< vector<int> > &adjMatrix, int start, int end) {
+void backtrack(vector<int> &previous, Realm verse[], vector< vector<int> > &adjMatrix, int start, int end) {
     int gems = 0; 
     int encants = 0;
     int distance = 0;
-    int current = previous[end];
-
+    int current = end;
+    cout << "Flag 1" << endl;
     while(1) {
         distance = adjMatrix[previous[current]][current];
+        cout << "Flag 2" << endl;
         if (verse[previous[current]].power < distance)
         {
             cout << "IMPOSSIBLE" << endl;
             break;
         } 
-
+        cout << "Flag 3" << endl;
+        cout << "Distance: " << distance << "Power: " << verse[previous[current]].power << endl; 
         gems += verse[previous[current]].getGems(distance); 
+        cout << "Flag 4" << endl;
         encants += distance; 
 
         if (previous[current] == start)
@@ -293,6 +324,8 @@ void backtrack(vector<int> &previous, vector<Realm> &verse, vector< vector<int> 
         } else {
             current = previous[current]; 
         }
+
+        cout << "Flag 5" << endl; 
     }
 } 
 
@@ -301,7 +334,8 @@ int main() {
     int size, magi;
     string charm, start, end;
     cin >> size;
-    Realm verse[size];
+    vector<Realm> verse(size);
+
      
     for (int i = 0; i < size; ++i)
     {
@@ -309,8 +343,8 @@ int main() {
     cin >> charm;
     cin >> magi;
      
-    verse[i] =  Realm(charm, magi);
-     
+    verse[i] =  Realm(charm, magi,i);
+
     }
      
     cin >> start >> end;
@@ -340,7 +374,7 @@ int main() {
     vector<int> predecessor(size);
     vector<Realm> distance(size);
     
-    //cout << dijkstra(verse,adjMatrix,source,target,size,predecessor,distance,start,end) << endl;
+    cout << dijkstra(verse,adjMatrix,source,target,size,predecessor,distance,start,end) << endl;
     return 0;
     
 }
