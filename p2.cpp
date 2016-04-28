@@ -102,8 +102,9 @@ public:
                         
                     }
                     
-                    if (low == magi[i])
+                    if (low == magi[i]) {
                         continue;
+                    }
                     
                     lis[low] = i;
                     parent[i] = lis[low-1];
@@ -157,26 +158,15 @@ public:
     
     //Returns the gem cost of moving to the next realm, given the levenshtein distance between the 2 strings
     int getGems(int dist) {
-        int gems = magi[0];
-        int maxMagi = magi[0];
-        for (int i = 1; i < dist; ++i)
-        {
-            if (magi[i] > maxMagi)
-            {
-                gems += magi[i];
-                maxMagi = magi[i];
-            }
-            magi[i] = 0;
+        if(dist > power) {
+            return 0;
         }
-        return gems;
+        else {
+            for(int i = 0; i < dist; i++) {
+                gems += order[i];
+            }
+        }
     }
-    /********************************************************************/
-    //Is this needed? Can't save power between realms
-    void spendPower(int amount) {
-        power -= amount;
-    }
-    /********************************************************************/
-    
 };
 
 unsigned int levDis(string a, string b) { //Finds the minimum distance between 2 strings, including inserts, deletes, swaps, Implements the Levenshtein Distance algorithm
