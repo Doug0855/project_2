@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <stack>
 #include <climits>
+#include <queue>
 
 using namespace std;
 class Realm {  //Data structure to hold realm info, contains methods to calculate certain properties of the realm
@@ -14,6 +15,7 @@ public:
     int* order;   //LSI of magi to use. Can use as many as needed
     int power;   //Max number of incantations possible for the given relam
     int gems;    //Number of gems required to leave realm
+    int dvalue;   //value from the distance array for this node in Dijkstra
 
     Realm(string charm, int nummagi) {
         
@@ -212,34 +214,43 @@ unsigned int levDis(string a, string b) { //Finds the minimum distance between 2
     }
     return mat[sA][sB];
 }
+struct realm_dvalue_greater_than {
+    bool operator()(const Realm& a, const Realm& b) const {
+        return a.dvalue < b.dvalue;
+    }
+};
 
-int dijkstra(class Realm verse[], vector< vector<int> > &adjMatrix, int sourcenode, int endnode, int size, vector<int> &predecessor,vector<int> &distance)
+int dijkstra(class Realm verse[], vector< vector<int> > &adjMatrix, int sourcenode, int endnode, int size, vector<int> &predecessor,vector<Realm> &distance, string startrealm,string endrealm)
 {
     
     vector<Realm> vertexSet (size);
+    int start_index;
+    int end_index;
     
     for(int i = 0; i < size; i++)
     {
-        /*
-        predecessor[i] = 100;   //in place of undefined?
-        distance[i] = 100;  //in place of infitiy?
-        vertexSet[i] = verse[i];
-        */
-        distance.push_back(100);
-        predecessor.push_back(100);
-        //vertexSet.push_back(i);
-    }
-    
-    for(int i = 0; i < size; i++)
-    {
-        for(int j = 0; j < size; j++)
+        distance.push_back(verse[i]);
+        if(distance[i].charm == startrealm)
         {
-            cout << " " << adjMatrix[i][j];
+            //start_index = i;
+            distance[i].dvalue = 0;
+            cout << distance[i].dvalue << endl;
         }
-        cout << endl;
+        else if(distance[i].charm == endrealm)
+        {
+            end_index = i;
+        }
+        else
+        {        
+            distance[i].dvalue = INT_MAX;
+            predecessor.push_back(INT_MAX);
+            //vertexSet.push_back(i);
+        }  
     }
-    distance[sourcenode] = 0;
-    sort(distance.begin(), distance.end());
+    
+    make_heap(distance.begin(),distance.end(),realm_dvalue_greater_than());
+    //cout << distance.front().dvalue << endl;
+    /*
     int counter = 0;
     while(counter < size)   //!vertexSet.empty()
     {
@@ -248,8 +259,8 @@ int dijkstra(class Realm verse[], vector< vector<int> > &adjMatrix, int sourceno
         {
             if(adjMatrix[counter][i] <= verse[i].power)    //enough magi to make incantations
             {
-                unsigned int size = distance[counter] + adjMatrix[counter][i];
-                if(size < distance[i])
+                int length = distance[counter] + adjMatrix[counter][i];
+                if(length < distance[i])
                 {
                     distance[i] = size;
                     predecessor[i] = counter;
@@ -258,12 +269,14 @@ int dijkstra(class Realm verse[], vector< vector<int> > &adjMatrix, int sourceno
         }
         counter++;
     }
-    
-    return distance[endnode];
+    */
+    return 1;
+    //return distance[end_index].dvalue;
     
 }
 
 int main() {
+    
     int size, magi;
     string charm, start, end;
     cin >> size;
@@ -304,8 +317,9 @@ int main() {
         }
     }
     vector<int> predecessor(size);
-    vector<int> distance(size);
-    cout << dijkstra(verse,adjMatrix,source,target,size,predecessor,distance) << endl;
-
+    vector<Realm> distance(size);
+    
+    //cout << dijkstra(verse,adjMatrix,source,target,size,predecessor,distance,start,end) << endl;
     return 0;
+    
 }
