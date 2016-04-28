@@ -224,7 +224,7 @@ struct realm_dvalue_greater_than {
     }
 };
 
-void dijkstra(vector<Realm> &verse, vector< vector<int> > &adjMatrix, int sourcenode, int endnode, int size, vector<int> &predecessor,vector<Realm> &distance, string startrealm,string endrealm)
+int dijkstra(vector<Realm> &verse, vector< vector<int> > &adjMatrix, int sourcenode, int endnode, int size, vector<int> &predecessor,vector<Realm> &distance, string startrealm,string endrealm)
 {
     priority_queue<Realm,vector<Realm>,realm_dvalue_greater_than> minHeap;
     vector<Realm> vertexSet (size);
@@ -293,7 +293,7 @@ void dijkstra(vector<Realm> &verse, vector< vector<int> > &adjMatrix, int source
         }
     }
     
-//return verse[end_index].dvalue;
+return verse[end_index].dvalue;
     
 }
 
@@ -380,16 +380,24 @@ int main() {
     vector<int> predecessor_gb(size); 
     vector<Realm> distance_gb(size); 
     
-    dijkstra(verse,adjMatrix,source,target,size,predecessor,distance,start,end);
-    backtrack(predecessor, verse, adjMatrix, source, target); 
-
+    int temp1 = dijkstra(verse,adjMatrix,source,target,size,predecessor,distance,start,end);
+    if (temp1 < 0) 
+    {   
+        cout << "IMPOSSIBLE" << endl; 
+    } else {
+        backtrack(predecessor, verse, adjMatrix, source, target);
+    }
     for (int i = 0; i < size; ++i)
       {
           verse[i].popped = false; 
       }  
 
-    dijkstra(verse,adjMatrix,target,source,size,predecessor_gb,distance_gb,end,start);
-    backtrack(predecessor_gb, verse, adjMatrix, target, source);     
+    int temp2 = dijkstra(verse,adjMatrix,target,source,size,predecessor_gb,distance_gb,end,start);
+    if (temp2 < 0) {
+        cout << "IMPOSSIBLE" << endl;
+    } else {
+        backtrack(predecessor_gb, verse, adjMatrix, target, source);     
+    }
     return 0;
     
 }
