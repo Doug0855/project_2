@@ -276,7 +276,7 @@ void backtrack(vector<int> &previous, vector<Realm> &verse, vector< vector<int> 
     int current = previous[end];
 
     while(1) {
-        distance = adjMatrix[current][previous[current]];
+        distance = adjMatrix[previous[current]][current];
         if (verse[previous[current]].power < distance)
         {
             cout << "IMPOSSIBLE" << endl;
