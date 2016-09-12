@@ -11,7 +11,7 @@ class Realm {  //Data structure to hold realm info, contains methods to calculat
 public:
     string charm;
     int size;       //Size of magi Array
-    int* magi;      //Holds the values and sequence of the magi
+    int* magi;      //Holds the values and sequences of the magi
     int* order;     //LSI of magi to use. Can use as many as needed
     int power;      //Max number of incantations possible for the given relam
     int gems;       //Number of gems required to leave realm
