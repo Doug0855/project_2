@@ -17,7 +17,6 @@ int getGems(int dist) {
         cout << "Flag 9"  << endl; 
     }
 
-//COPY PASTE THIS IN 
 void backtrack(vector<int> &previous, Realm verse[], vector< vector<int> > &adjMatrix, int start, int end) {
     int gems = 0; 
     int encants = 0;
